@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -eux
+
+script_dir=$(dirname "$0")
+base_dir="$script_dir/.."
+cd "$base_dir"
+
+docker build protoc-go -t hatena-intern-2020-protoc-go
+docker build protoc-ts -t hatena-intern-2020-protoc-ts
+
+mkdir -p go/account ts/account
+docker run -v "$(pwd):/pb" -w /pb --rm hatena-intern-2020-protoc-go \
+  protoc \
+    --go_out=plugins=grpc:go/account \
+    --go_opt=paths=source_relative \
+    account.proto
+docker run -v "$(pwd):/pb" -w /pb --rm hatena-intern-2020-protoc-ts \
+  grpc_tools_node_protoc \
+    --plugin=protoc-gen-ts=/usr/local/share/.config/yarn/global/node_modules/grpc_tools_node_protoc_ts/bin/protoc-gen-ts \
+    --js_out=import_style=commonjs,binary:ts/account \
+    --grpc_out=ts/account \
+    --ts_out=ts/account \
+    account.proto
+mkdir -p ../services/account/pb ../services/blog/pb
+cp -r ./go/account ../services/account/pb
+cp -r ./go/account ../services/blog/pb
+
+mkdir -p go/renderer ts/renderer
+docker run -v "$(pwd):/pb" -w /pb --rm hatena-intern-2020-protoc-go \
+  protoc \
+    --go_out=plugins=grpc:go/renderer \
+    --go_opt=paths=source_relative \
+    renderer.proto
+docker run -v "$(pwd):/pb" -w /pb --rm hatena-intern-2020-protoc-ts \
+  grpc_tools_node_protoc \
+    --plugin=protoc-gen-ts=/usr/local/share/.config/yarn/global/node_modules/grpc_tools_node_protoc_ts/bin/protoc-gen-ts \
+    --js_out=import_style=commonjs,binary:ts/renderer \
+    --grpc_out=ts/renderer \
+    --ts_out=ts/renderer \
+    renderer.proto
+mkdir -p ../services/renderer-go/pb ../services/renderer-ts/pb ../services/blog/pb
+cp -r ./go/renderer ../services/renderer-go/pb
+cp -r ./ts/renderer ../services/renderer-ts/pb
+cp -r ./go/renderer ../services/blog/pb

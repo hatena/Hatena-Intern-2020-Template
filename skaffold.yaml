@@ -1,0 +1,28 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: hatena-intern-2020
+build:
+  artifacts:
+  - image: hatena-intern-2020-account
+    context: services/account
+  - image: hatena-intern-2020-account-test
+    context: services/account
+    docker:
+      dockerfile: Dockerfile.test
+  - image: hatena-intern-2020-blog
+    context: services/blog
+  - image: hatena-intern-2020-blog-test
+    context: services/blog
+    docker:
+      dockerfile: Dockerfile.test
+  - image: hatena-intern-2020-renderer-go
+    context: services/renderer-go
+  local:
+    push: false
+    useBuildkit: true
+deploy:
+  kubeContext: hatena-intern-2020
+  kustomize:
+    paths:
+    - k8s

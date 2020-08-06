@@ -1,0 +1,19 @@
+{{define "title"}}新規ブログ作成{{end}}
+
+{{define "body"}}
+<section>
+  <header>
+    <h1>新規ブログ作成</h1>
+    <p><a href="/my/blogs">ブログ一覧に戻る</a></p>
+  </header>
+  <section>
+    <form method="POST" action="/my/blogs">
+      <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+      <p><label>パス <input type="text" name="path"></label></p>
+      <p><label>タイトル <input type="text" name="title"></label></p>
+      <p><label>説明 <textarea name="description"></textarea></label></p>
+      <p><input type="submit" value="作成"></p>
+    </form>
+  </section>
+</section>
+{{end}}

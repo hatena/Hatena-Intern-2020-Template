@@ -1,0 +1,25 @@
+{{define "title"}}{{.Entry.Title}}{{end}}
+
+{{define "body"}}
+<section>
+  <header>
+    <h1><a href="/blogs/{{.Blog.Path}}">{{.Blog.Title}}</a></h1>
+    <p>{{.Blog.Description}}</p>
+    {{if .IsAuthor}}
+    <p><a href="/my/blogs/{{.Blog.Path}}">管理</a></p>
+    {{end}}
+  </header>
+  <section>
+    <article>
+      <header>
+        <h1><a href="/blogs/{{.Blog.Path}}/entries/{{.Entry.ID}}">{{.Entry.Title}}</a></h1>
+        <p>{{.Entry.PublishedAt}}</p>
+        {{if .IsAuthor}}
+        <p><a href="/my/blogs/{{.Blog.Path}}/entries/{{.Entry.ID}}">編集</a></p>
+        {{end}}
+      </header>
+      <section>{{.Entry.BodyHTML | unescapedHTML}}</section>
+    </article>
+  </section>
+</section>
+{{end}}

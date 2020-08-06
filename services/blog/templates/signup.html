@@ -1,0 +1,12 @@
+{{define "title"}}サインアップ{{end}}
+
+{{define "body"}}
+<section>
+  <form method="POST" action="/signup">
+    <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+    <p><label>ユーザー名 <input type="text" name="name"></label></p>
+    <p><label>パスワード <input type="text" name="password"></label></p>
+    <p><input type="submit" value="サインアップ"></p>
+  </form>
+</section>
+{{end}}

@@ -1,0 +1,44 @@
+{{define "title"}}{{.Blog.Title}}{{end}}
+
+{{define "body"}}
+<section>
+  <header>
+    <h1><a href="/blogs/{{.Blog.Path}}">{{.Blog.Title}}</a></h1>
+    <p>{{.Blog.Description}}</p>
+    {{if .IsAuthor}}
+    <p><a href="/my/blogs/{{.Blog.Path}}">管理</a></p>
+    {{end}}
+  </header>
+  <section>
+    {{range .Entries}}
+    <article>
+      <header>
+        <h1><a href="/blogs/{{$.Blog.Path}}/entries/{{.ID}}">{{.Title}}</a></h1>
+        <p>{{.PublishedAt}}</p>
+        {{if $.IsAuthor}}
+        <p><a href="/my/blogs/{{$.Blog.Path}}/entries/{{.ID}}">編集</a></p>
+        {{end}}
+      </header>
+      <section>{{.BodyHTML | unescapedHTML}}</section>
+    </article>
+    {{end}}
+    <footer>
+      <p>
+        <span>
+          {{if .HasPrevPage}}
+          <a href="/blogs/{{.Blog.Path}}?page={{.PrevPage}}">&lt;</a>
+          {{end}}
+        </span>
+        <span>
+          Page {{.Page}}
+        </span>
+        <span>
+          {{if .HasNextPage}}
+          <a href="/blogs/{{.Blog.Path}}?page={{.NextPage}}">&gt;</a>
+          {{end}}
+        </span>
+      </p>
+    </footer>
+  </section>
+</section>
+{{end}}

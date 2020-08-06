@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: renderer-go
+  labels:
+    app: renderer-go
+spec:
+  ports:
+  - port: 50051
+  selector:
+    app: renderer-go
+    tier: app
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: renderer-go
+  labels:
+    app: renderer-go
+spec:
+  selector:
+    matchLabels:
+      app: renderer-go
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: renderer-go
+        tier: app
+    spec:
+      containers:
+      - image: hatena-intern-2020-renderer-go
+        imagePullPolicy: Never
+        name: renderer-go
+        env:
+        - name: GRPC_PORT
+          value: "50051"
+        envFrom:
+        - configMapRef:
+            name: renderer-go-app-env-vars
+        resources:
+          requests:
+            cpu: 10m
+            memory: 5Mi
+          limits:
+            cpu: 20m
+            memory: 10Mi
+        ports:
+        - containerPort: 50051
+          name: renderer-go
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          initialDelaySeconds: 5
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          initialDelaySeconds: 10
+        securityContext:
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - all
+            add:
+            - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true

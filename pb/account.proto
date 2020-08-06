@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option go_package = "github.com/hatena/Hatena-Intern-2020/pb/go/account"; // fake
+package account;
+
+service Account {
+  rpc Signup(SignupRequest) returns (SignupReply);
+  rpc Signin(SigninRequest) returns (SigninReply);
+}
+
+// signup
+
+message SignupRequest {
+  string name = 1;
+  string password = 2;
+}
+
+message SignupReply {
+  string token = 1;
+}
+
+// signup
+
+message SigninRequest {
+  string name = 1;
+  string password = 2;
+}
+
+message SigninReply {
+  string token = 1;
+}

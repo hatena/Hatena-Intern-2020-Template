@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: account-db
+  labels:
+    app: account
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: account
+    tier: db
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: account-db-pv-claim
+  labels:
+    app: account
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: account-db-initdb-config
+data:
+  init.sh: |
+    #!/bin/bash
+    set -eux
+    mysqladmin -uroot create intern_2020_account
+    mysqladmin -uroot create intern_2020_account_test
+    mysql -uroot intern_2020_account < /config/schema.sql
+    mysql -uroot intern_2020_account_test < /config/schema.sql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: account-db
+  labels:
+    app: account
+spec:
+  selector:
+    matchLabels:
+      app: account
+      tier: db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: account
+        tier: db
+    spec:
+      containers:
+      - image: mysql:8.0
+        name: mysql
+        args:
+        - --lower-case-table-names=1
+        env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "1"
+        - name: TZ
+          value: UTC
+        resources:
+          requests:
+            cpu: 30m
+            memory: 384Mi
+          limits:
+            cpu: 300m
+            memory: 1Gi
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: mysql-initdb-volume
+          mountPath: /docker-entrypoint-initdb.d
+          readOnly: true
+        - name: mysql-schema-volume
+          mountPath: /config
+          readOnly: true
+        livenessProbe:
+          exec:
+            command: ["mysqladmin", "ping"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["mysql", "-h", "127.0.0.1", "-e", "SELECT 1"]
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: account-db-pv-claim
+      - name: mysql-initdb-volume
+        configMap:
+          name: account-db-initdb-config
+          defaultMode: 0755
+      - name: mysql-schema-volume
+        configMap:
+          name: account-db-schema-config

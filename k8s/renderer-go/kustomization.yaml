@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- app.yaml
+configMapGenerator:
+- name: renderer-go-app-env-vars
+  literals:
+  - MODE=development

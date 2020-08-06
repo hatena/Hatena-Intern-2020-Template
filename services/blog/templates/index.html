@@ -1,0 +1,61 @@
+{{define "title"}}ブログ{{end}}
+
+{{define "body"}}
+<section>
+  <header>
+    <h1>ブログ</h1>
+    <nav>
+      {{if .User}}
+      <p>ようこそ {{.User.Name}} さん</p>
+      {{end}}
+      <ul>
+        {{if .User}}
+        <li><a href="/my/blogs">マイページ</a></li>
+        <li><a href="/signout">サインアウト</a></li>
+        {{else}}
+        <li><a href="/signup">サインアップ</a></li>
+        <li><a href="/signin">サインイン</a></li>
+        {{end}}
+      </ul>
+    </nav>
+  </header>
+  <section>
+    <header>
+      <h1>みんなのブログ</h1>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <td>タイトル</td>
+          <td>説明</td>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Blogs}}
+        <tr>
+          <td><a href="/blogs/{{.Path}}">{{.Title}}</a></td>
+          <td>{{.Description}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    <footer>
+      <p>
+        <span>
+          {{if .HasPrevPage}}
+          <a href="/?page={{.PrevPage}}">&lt;</a>
+          {{end}}
+        </span>
+        <span>
+          Page {{.Page}}
+        </span>
+        <span>
+          {{if .HasNextPage}}
+          <a href="/?page={{.NextPage}}">&gt;</a>
+          {{end}}
+        </span>
+      </p>
+    </footer>
+  </section>
+</section>
+{{end}}

@@ -1,0 +1,10 @@
+{{define "title"}}サインアウト{{end}}
+
+{{define "body"}}
+<section>
+  <form method="POST" action="/signout">
+    <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+    <p><input type="submit" value="サインアウト"></p>
+  </form>
+</section>
+{{end}}

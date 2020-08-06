@@ -1,0 +1,47 @@
+{{define "title"}}{{.User.Name}} のブログ一覧{{end}}
+
+{{define "body"}}
+<section>
+  <header>
+    <h1>{{.User.Name}} のブログ一覧</h1>
+    <p><a href="/my/blogs/-/create">新規作成</a></p>
+  </header>
+  <section>
+    <table>
+      <thead>
+        <tr>
+          <td>タイトル</td>
+          <td>説明</td>
+          <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Blogs}}
+        <tr>
+          <td><a href="/my/blogs/{{.Path}}">{{.Title}}</a></td>
+          <td>{{.Description}}</td>
+          <td><a href="/blogs/{{.Path}}" target="_blank" rel="nofollow noopener">Go</a></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    <footer>
+      <p>
+        <span>
+          {{if .HasPrevPage}}
+          <a href="/my/blogs?page={{.PrevPage}}">&lt;</a>
+          {{end}}
+        </span>
+        <span>
+          Page {{.Page}}
+        </span>
+        <span>
+          {{if .HasNextPage}}
+          <a href="/my/blogs?page={{.NextPage}}">&gt;</a>
+          {{end}}
+        </span>
+      </p>
+    </footer>
+  </section>
+</section>
+{{end}}

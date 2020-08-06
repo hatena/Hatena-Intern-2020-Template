@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- app.yaml
+- db.yaml
+- test.yaml
+secretGenerator:
+- name: account-app-secret
+  files:
+  - secret/ecdsa-private.pem
+configMapGenerator:
+- name: account-app-env-vars
+  literals:
+  - MODE=development
+  - DATABASE_DSN=root@(account-db:3306)/intern_2020_account?time_zone=UTC&parseTime=true&loc=UTC
+- name: account-test-env-vars
+  literals:
+  - TEST_DATABASE_DSN=root@(account-db:3306)/intern_2020_account_test?time_zone=UTC&parseTime=true&loc=UTC
+- name: account-db-schema-config
+  files:
+  - config/schema.sql

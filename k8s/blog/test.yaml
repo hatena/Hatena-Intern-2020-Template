@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-test
+  labels:
+    app: blog
+spec:
+  selector:
+    matchLabels:
+      app: blog
+      tier: test
+  template:
+    metadata:
+      labels:
+        app: blog
+        tier: test
+    spec:
+      containers:
+      - image: hatena-intern-2020-blog-test
+        imagePullPolicy: Never
+        name: blog-test
+        command: ["sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+        envFrom:
+        - configMapRef:
+            name: blog-test-env-vars

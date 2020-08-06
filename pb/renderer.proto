@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/hatena/Hatena-Intern-2020/pb/go/renderer"; // fake
+package renderer;
+
+service Renderer {
+  rpc Render(RenderRequest) returns (RenderReply);
+}
+
+// render
+
+message RenderRequest {
+  string src = 1;
+}
+
+message RenderReply {
+  string html = 1;
+}

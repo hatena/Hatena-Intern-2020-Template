@@ -1,0 +1,25 @@
+{{define "title"}}{{.Blog.Title}} を編集{{end}}
+
+{{define "body"}}
+<section>
+  <header>
+    <h1>{{.Blog.Title}} を編集</h1>
+    <p><a href="/my/blogs/{{.Blog.Path}}">ブログ詳細に戻る</a></p>
+  </header>
+  <section>
+    <form method="POST" action="/my/blogs/{{.Blog.Path}}/edit">
+      <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+      <p><label>パス <span>/blogs/{{.Blog.Path}}</span></p>
+      <p><label>タイトル <input type="text" name="title" value="{{.Blog.Title}}"></label></p>
+      <p><label>説明 <textarea name="description">{{.Blog.Description}}</textarea></label></p>
+      <p><input type="submit" value="更新"></p>
+    </form>
+  </section>
+  <section>
+    <form method="POST" action="/my/blogs/{{.Blog.Path}}/delete">
+      <input type="hidden" name="csrf_token" value="{{.CsrfToken}}">
+      <p><input type="submit" value="削除"></p>
+    </form>
+  </section>
+</section>
+{{end}}

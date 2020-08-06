@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog
+  labels:
+    app: blog
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: blog
+    tier: app
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+  labels:
+    app: blog
+spec:
+  selector:
+    matchLabels:
+      app: blog
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: blog
+        tier: app
+    spec:
+      initContainers:
+      - name: init-blog-db
+        image: busybox
+        command: ["sh", "-c", "until nslookup blog-db.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local > /dev/null; do sleep 1; done"]
+      - name: init-account
+        image: busybox
+        command: ["sh", "-c", "until nslookup account.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local > /dev/null; do sleep 1; done"]
+      containers:
+      - image: hatena-intern-2020-blog
+        imagePullPolicy: Never
+        name: blog
+        env:
+        - name: PORT
+          value: "8080"
+        - name: ACCOUNT_ECDSA_PUBLIC_KEY_FILE
+          value: /secret/account-ecdsa-public.pem
+        envFrom:
+        - configMapRef:
+            name: blog-app-env-vars
+        resources:
+          requests:
+            cpu: 10m
+            memory: 5Mi
+          limits:
+            cpu: 20m
+            memory: 10Mi
+        ports:
+        - containerPort: 8080
+          name: blog
+        volumeMounts:
+        - name: blog-app-secret-volume
+          mountPath: /secret
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /server/health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 60 # 開発環境ではアクセスログが大量に流れないように間隔を長くしておく
+        securityContext:
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - all
+            add:
+            - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+      volumes:
+      - name: blog-app-secret-volume
+        secret:
+          secretName: blog-app-secret

@@ -1,0 +1,61 @@
+{{define "title"}}{{.Blog.Title}}{{end}}
+
+{{define "body"}}
+<section>
+  <header>
+    <h1>{{.Blog.Title}}</h1>
+    <p><a href="/my/blogs">ブログ一覧に戻る</a></p>
+    <p><a href="/blogs/{{.Blog.Path}}" target="_blank" rel="nofollow noopener">Go</a></p>
+  </header>
+  <section>
+    <dl>
+      <dt>パス</dt>
+      <dd>/blogs/{{.Blog.Path}}</dd>
+      <dt>説明</dt>
+      <dd>{{.Blog.Description}}</dd>
+    </dl>
+    <p><a href="/my/blogs/{{.Blog.Path}}/edit">編集</a></p>
+  </section>
+  <section>
+    <h1>エントリ一覧</h1>
+    <p><a href="/my/blogs/{{.Blog.Path}}/entries/-/publish">新規投稿</a></p>
+    <table>
+      <thead>
+        <tr>
+          <td>タイトル</td>
+          <td>投稿日時</td>
+          <td>編集日時</td>
+          <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Entries}}
+        <tr>
+          <td><a href="/my/blogs/{{$.Blog.Path}}/entries/{{.ID}}">{{.Title}}</a></td>
+          <td>{{.PublishedAt}}</td>
+          <td>{{.EditedAt}}</td>
+          <td><a href="/blogs/{{$.Blog.Path}}/entries/{{.ID}}" target="_blank" rel="nofollow noopener">Go</a></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    <footer>
+      <p>
+        <span>
+          {{if .HasPrevPage}}
+          <a href="/my/blogs/{{.Blog.Path}}?page={{.PrevPage}}">&lt;</a>
+          {{end}}
+        </span>
+        <span>
+          Page {{.Page}}
+        </span>
+        <span>
+          {{if .HasNextPage}}
+          <a href="/my/blogs/{{.Blog.Path}}?page={{.NextPage}}">&gt;</a>
+          {{end}}
+        </span>
+      </p>
+    </footer>
+  </section>
+</section>
+{{end}}
