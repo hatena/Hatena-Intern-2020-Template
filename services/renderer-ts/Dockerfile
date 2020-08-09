@@ -22,7 +22,6 @@ RUN --mount=type=cache,id=yarn,target=/usr/local/share/.cache/yarn/v6 \
   yarn install --frozen-lockfile --production true
 COPY pb pb
 
-RUN adduser -D -u 1000 app
 USER 1000
 
 ENTRYPOINT ["node", "dist/index.js"]
