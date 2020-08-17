@@ -1,6 +1,6 @@
 FROM golang:1.14-alpine
 
-RUN apk --update add make
+RUN apk --update add make apache2-utils
 
 WORKDIR /services/blog
 COPY go.mod go.sum ./

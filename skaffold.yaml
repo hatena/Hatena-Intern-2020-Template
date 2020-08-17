@@ -22,6 +22,7 @@ build:
     push: false
     useBuildkit: true
 deploy:
+  statusCheckDeadlineSeconds: 180
   kubeContext: hatena-intern-2020
   kustomize:
     paths:
