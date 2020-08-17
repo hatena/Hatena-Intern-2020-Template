@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -65,7 +66,13 @@ func run(args []string) error {
 	s := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpc_ctxtags.UnaryServerInterceptor(),
-			grpc_zap.UnaryServerInterceptor(logger),
+			grpc_zap.UnaryServerInterceptor(
+				logger,
+				grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
+					// ヘルスチェックのログを無効化
+					return !strings.HasPrefix(fullMethodName, "/grpc.health.v1.Health/")
+				}),
+			),
 			grpc_recovery.UnaryServerInterceptor(),
 		)),
 	)

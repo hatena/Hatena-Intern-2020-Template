@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/hatena/Hatena-Intern-2020/services/blog/app"
 	"github.com/hatena/Hatena-Intern-2020/services/blog/domain"
@@ -50,7 +51,12 @@ func (s *Server) Shutdown(ctx context.Context) error {
 }
 
 func (s *Server) attachMiddlewares() {
-	s.e.Use(middleware.Logger())
+	s.e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Skipper: func(ctx echo.Context) bool {
+			// ヘルスチェックのログを無効化
+			return strings.HasPrefix(ctx.Path(), "/server/health")
+		},
+	}))
 	s.e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLookup: "form:csrf_token",
 		Skipper: func(c echo.Context) bool {
