@@ -50,10 +50,10 @@ spec:
             name: blog-app-env-vars
         resources:
           requests:
-            cpu: 10m
+            cpu: 100m
             memory: 5Mi
           limits:
-            cpu: 20m
+            cpu: 200m
             memory: 10Mi
         ports:
         - containerPort: 8080

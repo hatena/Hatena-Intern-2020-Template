@@ -69,7 +69,7 @@ spec:
           value: UTC
         resources:
           requests:
-            cpu: 30m
+            cpu: 100m
             memory: 384Mi
           limits:
             cpu: 300m
