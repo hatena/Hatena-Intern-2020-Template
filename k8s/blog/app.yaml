@@ -51,10 +51,10 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 5Mi
+            memory: 10Mi
           limits:
             cpu: 200m
-            memory: 10Mi
+            memory: 20Mi
         ports:
         - containerPort: 8080
           name: blog
