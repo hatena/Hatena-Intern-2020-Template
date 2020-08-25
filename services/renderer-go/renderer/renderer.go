@@ -3,8 +3,11 @@ package renderer
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"html/template"
 	"regexp"
+
+	"github.com/yuin/goldmark"
 )
 
 var standAloneUrlRE = regexp.MustCompile(`[^(\(.*\)\[)]https?://[^\s]+[^\]]`)
@@ -14,15 +17,14 @@ var linkTmpl = template.Must(template.New("link").Parse(`<a href="{{.}}">{{.}}</
 // Render は受け取った文書を HTML に変換する
 func Render(ctx context.Context, src string) (string, error) {
 	// TODO: これはサンプル実装 (URL の自動リンク) です
-	html := standAloneUrlRE.ReplaceAllStringFunc(src, func(standAloneUrl string) string {
+	standAloneUrlConverted := standAloneUrlRE.ReplaceAllStringFunc(src, func(standAloneUrl string) string {
 		return exactUrlRE.ReplaceAllStringFunc(standAloneUrl, func(exactUrl string) string {
-			var w bytes.Buffer
-			err := linkTmpl.ExecuteTemplate(&w, "link", exactUrl)
-			if err != nil {
-				return exactUrl
-			}
-			return w.String()
+			return fmt.Sprintf("[%s](%s)", exactUrl, exactUrl)
 		})
 	})
-	return html, nil
+	var htmlBuf bytes.Buffer
+	if err := goldmark.Convert([]byte(standAloneUrlConverted), &htmlBuf); err != nil {
+		panic(err)
+	}
+	return htmlBuf.String(), nil
 }
