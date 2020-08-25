@@ -23,6 +23,13 @@ func Test_Render_Heading(t *testing.T) {
 	assert.Equal(t, "<h1>h1</h1>\n<p>foo</p>\n<h2>h2</h2>\n<p>hoge</p>\n", html)
 }
 
+func Test_Render_Gaming(t *testing.T) {
+	src := "++namachan10777++"
+	html, err := Render(context.Background(), src)
+	assert.NoError(t, err)
+	assert.Equal(t, "<p><span class=\"gaming\">namachan10777</span></p>\n", html)
+}
+
 func Test_Render_Link(t *testing.T) {
 	src := "[namachan10777](https://namachan10777.dev)"
 	html, err := Render(context.Background(), src)

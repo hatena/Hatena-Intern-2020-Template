@@ -12,6 +12,8 @@ import (
 
 var standAloneUrlRE = regexp.MustCompile(`[^(\(.*\)\[)]https?://[^\s]+[^\]]`)
 var exactUrlRE = regexp.MustCompile(`https?://[^\s]+`)
+var gamingRE = regexp.MustCompile(`\+\+.+\+\+`)
+var gamingREInner = regexp.MustCompile(`[^(\+\+)].+[^(\+\+)]`)
 var linkTmpl = template.Must(template.New("link").Parse(`<a href="{{.}}">{{.}}</a>`))
 
 // Render は受け取った文書を HTML に変換する
@@ -26,5 +28,8 @@ func Render(ctx context.Context, src string) (string, error) {
 	if err := goldmark.Convert([]byte(standAloneUrlConverted), &htmlBuf); err != nil {
 		panic(err)
 	}
-	return htmlBuf.String(), nil
+	fullConverted := gamingRE.ReplaceAllStringFunc(htmlBuf.String(), func(inner string) string {
+		return fmt.Sprintf("<span class=\"gaming\">%s</span>", inner[2:len(inner)-2])
+	})
+	return fullConverted, nil
 }
