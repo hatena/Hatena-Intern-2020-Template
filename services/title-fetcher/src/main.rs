@@ -17,9 +17,10 @@ impl TitleFetcher for MyTitleFetcher {
         request: Request<FetchRequest>,
     ) -> Result<Response<FetchReply>, Status> {
         println!("Got a request from {:?}", request.remote_addr());
-
+        let res = reqwest::get("https://hyper.rs").await.unwrap();
+        let body = res.text().await.unwrap();
         let reply = pb::FetchReply {
-            title: String::from("Hello World!"),
+            title: body,
         };
         Ok(Response::new(reply))
     }
