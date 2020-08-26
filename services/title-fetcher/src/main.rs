@@ -18,7 +18,7 @@ pub struct MyTitleFetcher {}
 
 enum Error {
     HTTP(reqwest::StatusCode),
-    Internal,
+    Internal(String),
     FailedToSerialize,
 }
 
@@ -27,7 +27,7 @@ enum Error {
 async fn fetch_title(url: &str) -> Result<String, Error> {
     let res = reqwest::get(url)
         .await
-        .map_err(|e| e.status().map_or_else(|| Error::Internal, Error::HTTP))?;
+        .map_err(|e| e.status().map_or_else(|| Error::Internal(format!("{:?}", e)), Error::HTTP))?;
     let body = res.text().await.map_err(|_| Error::FailedToSerialize)?;
     let title = title_fetcher::parser::parse(&mut io::Cursor::new(body));
     Ok(title.unwrap_or_else(String::new))
@@ -43,9 +43,9 @@ impl TitleFetcher for MyTitleFetcher {
                 Code::InvalidArgument,
                 format!("failed to request via HTTP: {:?}", status),
             )),
-            Err(Error::Internal) => Err(Status::new(Code::InvalidArgument, "Invalid argument")),
+            Err(Error::Internal(msg)) => Err(Status::new(Code::InvalidArgument, format!("Invalid argument msg: {}", msg))),
             Err(Error::FailedToSerialize) => {
-                Err(Status::new(Code::InvalidArgument, "Internal Error"))
+                Err(Status::new(Code::Internal, "Internal Error: Failed to serialize text"))
             }
         }
     }
