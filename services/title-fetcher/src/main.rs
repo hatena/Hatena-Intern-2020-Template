@@ -1,8 +1,11 @@
-use tonic::{transport::Server, Request, Response, Status};
 extern crate title_fetcher;
 
 use std::io;
+use std::time::Duration;
+use tokio::time::delay_for;
 use tonic::{transport::Server, Code, Request, Response, Status};
+use tonic_health::server::HealthReporter;
+
 use pb::title_fetcher_server::{TitleFetcher, TitleFetcherServer};
 use pb::{FetchReply, FetchRequest};
 
@@ -32,10 +35,7 @@ async fn fetch_title(url: &str) -> Result<String, Error> {
 
 #[tonic::async_trait]
 impl TitleFetcher for MyTitleFetcher {
-    async fn fetch(
-        &self,
-        request: Request<FetchRequest>,
-    ) -> Result<Response<FetchReply>, Status> {
+    async fn fetch(&self, request: Request<FetchRequest>) -> Result<Response<FetchReply>, Status> {
         println!("Got a request from {:?}", request.remote_addr());
         match fetch_title(&request.into_inner().url).await {
             Ok(title) => Ok(Response::new(pb::FetchReply { title })),
@@ -47,13 +47,37 @@ impl TitleFetcher for MyTitleFetcher {
             Err(Error::FailedToSerialize) => {
                 Err(Status::new(Code::InvalidArgument, "Internal Error"))
             }
+        }
+    }
+}
+
+// TODO test health check service
+async fn twiddle_service_status(mut reporter: HealthReporter) {
+    let mut iter = 0u64;
+    loop {
+        iter += 1;
+        delay_for(Duration::from_secs(1)).await;
+
+        if iter % 2 == 0 {
+            reporter
+                .set_serving::<TitleFetcherServer<MyTitleFetcher>>()
+                .await;
+        } else {
+            reporter
+                .set_not_serving::<TitleFetcherServer<MyTitleFetcher>>()
+                .await;
         };
-        Ok(Response::new(reply))
     }
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let (mut health_reporter, health_service) = tonic_health::server::health_reporter();
+    health_reporter
+        .set_serving::<TitleFetcherServer<MyTitleFetcher>>()
+        .await;
+
+    tokio::spawn(twiddle_service_status(health_reporter.clone()));
     let addr = "[::1]:50051".parse().unwrap();
     let title_fetcher = MyTitleFetcher::default();
 
@@ -61,6 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Server::builder()
         .add_service(TitleFetcherServer::new(title_fetcher))
+        .add_service(health_service)
         .serve(addr)
         .await?;
 
