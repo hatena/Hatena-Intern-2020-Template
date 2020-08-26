@@ -66,6 +66,8 @@ func (s *Server) attachMiddlewares() {
 }
 
 func (s *Server) attachHandlers() {
+	s.e.File("/res/blog.css", "res/blog.css")
+
 	s.e.GET("/server/health", s.healthcheckHandler())
 
 	s.e.GET("/", s.IndexHandler())
@@ -95,6 +97,7 @@ func (s *Server) attachHandlers() {
 
 	s.e.GET("/blogs/:path", s.BlogHandler())
 	s.e.GET("/blogs/:path/entries/:id", s.EntryHandler())
+
 }
 
 // CustomContext はカスタマイズされたコンテキスト

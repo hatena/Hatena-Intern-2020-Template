@@ -15,6 +15,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build make build
 FROM alpine
 
 COPY --from=builder /services/blog/bin/server /services/blog/bin/server
+COPY --from=builder /services/blog/res /res
 
 RUN adduser -D -u 1000 app
 USER 1000

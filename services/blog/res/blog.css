@@ -1,0 +1,12 @@
+span.gaming {
+    background: linear-gradient(314deg, #00ff00, #0000ff, #ff0000);
+    background-size: 600% 600%;
+
+    animation: GamingAnimation 1s ease infinite;
+}
+
+@keyframes GamingAnimation {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
