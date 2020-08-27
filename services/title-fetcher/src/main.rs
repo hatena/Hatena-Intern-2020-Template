@@ -69,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await;
 
     tokio::spawn(twiddle_service_status(health_reporter.clone()));
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr = "0.0.0.0:50051".parse().unwrap();
     let title_fetcher = MyTitleFetcher::default();
 
     println!("TitleFetcherServer listening on {}", addr);
