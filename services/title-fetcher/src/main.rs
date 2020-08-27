@@ -4,7 +4,7 @@ use std::io;
 use std::time::Duration;
 use tokio::time::delay_for;
 use tonic::{transport::Server, Code, Request, Response, Status};
-use tonic_health::server::HealthReporter;
+use tonic_health::{server::HealthReporter, ServingStatus};
 
 use pb::title_fetcher_server::{TitleFetcher, TitleFetcherServer};
 use pb::{FetchReply, FetchRequest};
@@ -53,20 +53,11 @@ impl TitleFetcher for MyTitleFetcher {
 
 // TODO test health check service
 async fn twiddle_service_status(mut reporter: HealthReporter) {
-    let mut iter = 0u64;
     loop {
-        iter += 1;
         delay_for(Duration::from_secs(1)).await;
-
-        if iter % 2 == 0 {
-            reporter
-                .set_serving::<TitleFetcherServer<MyTitleFetcher>>()
-                .await;
-        } else {
-            reporter
-                .set_not_serving::<TitleFetcherServer<MyTitleFetcher>>()
-                .await;
-        };
+        reporter
+            .set_serving::<TitleFetcherServer<MyTitleFetcher>>()
+            .await;
     }
 }
 
@@ -74,7 +65,7 @@ async fn twiddle_service_status(mut reporter: HealthReporter) {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (mut health_reporter, health_service) = tonic_health::server::health_reporter();
     health_reporter
-        .set_serving::<TitleFetcherServer<MyTitleFetcher>>()
+        .set_service_status("".to_owned(), ServingStatus::Serving)
         .await;
 
     tokio::spawn(twiddle_service_status(health_reporter.clone()));
