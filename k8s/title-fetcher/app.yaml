@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: title-fetcher
+  labels:
+    app: title-fetcher
+spec:
+  ports:
+  - port: 50051
+  selector:
+    app: title-fetcher
+    tier: app
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: title-fetcher
+  labels:
+    app: title-fetcher
+spec:
+  selector:
+    matchLabels:
+      app: title-fetcher
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: title-fetcher
+        tier: app
+    spec:
+      containers:
+      - image: hatena-intern-2020-title-fetcher
+        imagePullPolicy: Never
+        name: title-fetcher
+        env:
+        - name: GRPC_PORT
+          value: "50051"
+        envFrom:
+        - configMapRef:
+            name: title-fetcher-app-env-vars
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 500Mi
+          limits:
+            cpu: 2000m
+            memory: 1000Mi
+        ports:
+        - containerPort: 50051
+          name: title-fetcher
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          initialDelaySeconds: 5
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+          initialDelaySeconds: 10
+        securityContext:
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - all
+            add:
+            - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true

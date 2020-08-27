@@ -6,3 +6,4 @@ resources:
 - account
 - blog
 - renderer-go
+- title-fetcher
