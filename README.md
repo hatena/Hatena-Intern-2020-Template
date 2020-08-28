@@ -137,3 +137,14 @@ minikube -n hatena-intern-2020 service blog
   - `renderer-go/`: 記法変換サービスの Go による実装
   - `renderer-ts/`: 記法変換サービスの TypeScript による実装
 - `k8s/`: アプリケーションを Kubernetes 上で動作させるためのマニフェスト
+
+## クレジット
+- 株式会社はてな
+  - [@akiym](https://github.com/akiym)
+  - [@cockscomb](https://github.com/cockscomb)
+  - [@itchyny](https://github.com/itchyny)
+  - [@susisu](https://github.com/susisu)
+
+(順不同)
+
+このリポジトリの内容は MIT ライセンスで提供されます. 詳しくは `LICENSE` をご確認ください.
