@@ -1,4 +1,8 @@
-# Hatena-Intern-2020
+# [Hatena SUMMER INTERNSHIP 2020](https://hatenacorp.jp/intern2020)
+
+「Hatena SUMMER INTERNSHIP 2020」では、Kubernetes上に構築されたブログシステムを題材としました。ブログシステムはマイクロサービスを意識しており、メインであるブログサービスに加えて、アカウントサービスや、Markdownなどの記法を変換するサービスが用意されています。それぞれのサービス間はgRPCを使ってやりとりしています。
+
+インターンシップのカリキュラムについては、[講義動画](https://hatenacorp.jp/intern2020/public_broadcast)や[課題](/docs/exercise.md)を公開しているので、参照してください。
 
 ## セットアップ
 アプリケーションの起動には以下が必要です.
